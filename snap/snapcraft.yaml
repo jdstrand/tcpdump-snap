@@ -1,0 +1,45 @@
+name: tcpdump
+summary: tcpdump for Ubuntu Core
+version: 4.9.3-4+snap1
+license: BSD-3-Clause
+description: |
+ tcpdump for Ubuntu Core
+grade: stable
+confinement: strict
+base: core20
+
+system-usernames:
+  snap_daemon: shared
+
+apps:
+  tcpdump:
+    command: usr/sbin/tcpdump -Z snap_daemon  # TODO: make this flexible
+    environment:
+      LD_PRELOAD: "$SNAP/wraplib.so"
+    plugs:
+    - bluetooth-control
+    - firewall-control
+    - network-control
+    - hardware-observe
+    - home
+    - removable-media
+
+parts:
+  tcpdump:
+    plugin: make
+    source: ./src
+    build-packages:
+    - build-essential
+    stage-packages:
+    - libpcap0.8
+    - tcpdump
+    stage:
+    - -etc
+    - -lib*
+    - -usr/lib/*/audit
+    - -usr/lib/*/engines*
+    - -usr/lib/*/gconv
+    - -usr/lib/*/libcrypto*
+    - -usr/lib/*/libssl*
+    - -usr/share/doc
+    - -usr/share/lintian
