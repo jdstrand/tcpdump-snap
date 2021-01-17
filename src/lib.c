@@ -70,9 +70,9 @@ int setgid(gid_t gid) {
 	gid_t g = 584788;
 	if (gid == 0) {
 		g = gid;
-	} else {
+	} /* else {
 		fprintf(stderr, "cannot setgid(%d), using %d\n", gid, g);
-	}
+	} */
 	return original_setgid(g);
 }
 
@@ -92,9 +92,9 @@ int setuid(uid_t uid) {
 	uid_t u = 584788;
 	if (uid == 0) {
 		u = uid;
-	} else {
+	} /* else {
 		fprintf(stderr, "cannot setuid(%d), using %d\n", uid, u);
-	}
+	} */
 	return original_setuid(u);
 }
 
@@ -114,16 +114,16 @@ int chown(const char *pathname, uid_t uid, gid_t gid) {
 	uid_t u = 584788;
 	if (uid == 0) {
 		u = uid;
-	} else {
+	} /* else {
 		fprintf(stderr,
 			"cannot chown(..., %d, ...), using %d\n", uid, u);
-	}
+	} */
 	gid_t g = 584788;
 	if (gid == 0) {
 		g = gid;
-	} else {
+	} /* else {
 		fprintf(stderr,
 			"cannot chown(..., ..., %d), using %d\n", gid, g);
-	}
+	} */
 	return original_chown(pathname, u, g);
 }
