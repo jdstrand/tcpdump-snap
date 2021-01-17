@@ -20,7 +20,7 @@ system-usernames:
 slots:
   captures:
     interface: content
-    read:
+    write:
     - $SNAP_COMMON/captures
 
 hooks:

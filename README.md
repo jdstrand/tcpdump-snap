@@ -36,13 +36,14 @@ write to. Eg:
 
 ## Integration with other snaps
 
-This snap exports the ```/var/snap/tcpdump/common/captures``` via the content
-interface. Other snaps may specify in their ```snap.yaml```:
+This snap exports the ```/var/snap/tcpdump/common/captures``` as a writable
+area via the content interface. Other snaps may specify in their
+```snap.yaml```:
 
     plugs:
       captures:
         interface: content
-        target: $SNAP/tcpdump-captures
+        target: $SNAP_DATA/tcpdump-captures
 
 Then when install that snap:
 
