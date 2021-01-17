@@ -16,6 +16,7 @@ static int (*original_setgroups) (size_t, const gid_t[]);
 static int (*original_initgroups) (const char *, const gid_t);
 static int (*original_setgid) (const gid_t);
 static int (*original_setuid) (const uid_t);
+static int (*original_chown) (const char *, const uid_t, const gid_t);
 
 int setgroups(size_t size, const gid_t *list) {
 	// lookup the libc's setgroups() if we haven't already
@@ -50,7 +51,8 @@ int initgroups(const char *user, const gid_t group) {
 /*
  * The tcpdump from the Ubuntu will setuid/setgid to the tcpdump user, which
  * isn't allowed by the sandbox policy. The -Z allows choosing another user,
- * so allow -Z to root, otherwise always drop to snap_daemon.
+ * so allow -Z to root, otherwise always drop to snap_daemon. Do the same with
+ * chown() for writing out pcap files.
  */
 int setgid(gid_t gid) {
 	// lookup the libc's setgid() if we haven't already
@@ -75,7 +77,7 @@ int setgid(gid_t gid) {
 }
 
 int setuid(uid_t uid) {
-	// lookup the libc's setgid() if we haven't already
+	// lookup the libc's setuid() if we haven't already
 	if (!original_setuid) {
 		dlerror();
 		original_setuid = dlsym(RTLD_NEXT, "setuid");
@@ -94,4 +96,34 @@ int setuid(uid_t uid) {
 		fprintf(stderr, "cannot setuid(%d), using %d\n", uid, u);
 	}
 	return original_setuid(u);
+}
+
+int chown(const char *pathname, uid_t uid, gid_t gid) {
+	// lookup the libc's chown() if we haven't already
+	if (!original_chown) {
+		dlerror();
+		original_chown = dlsym(RTLD_NEXT, "chown");
+		if (!original_chown) {
+			fprintf(stderr, "could not find chown in libc");
+			return -1;
+		}
+		dlerror();
+	}
+
+	// we could look this up and fail, but snapd hardcodes it
+	uid_t u = 584788;
+	if (uid == 0) {
+		u = uid;
+	} else {
+		fprintf(stderr,
+			"cannot chown(..., %d, ...), using %d\n", uid, u);
+	}
+	gid_t g = 584788;
+	if (gid == 0) {
+		g = gid;
+	} else {
+		fprintf(stderr,
+			"cannot chown(..., ..., %d), using %d\n", gid, g);
+	}
+	return original_chown(pathname, u, g);
 }
