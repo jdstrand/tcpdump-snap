@@ -19,7 +19,9 @@ system-usernames:
 
 apps:
   tcpdump:
-    command: usr/sbin/tcpdump -Z snap_daemon  # TODO: make this flexible
+    # -Z snap_daemon works but if specify -Z root is looks weird in ps
+    # even though it ends up running as root. Perhaps update wrapper?
+    command: usr/sbin/tcpdump -Z snap_daemon
     environment:
       LD_PRELOAD: "$SNAP/wraplib.so"
     plugs:
