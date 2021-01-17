@@ -17,6 +17,16 @@ architectures:
 system-usernames:
   snap_daemon: shared
 
+slots:
+  captures:
+    interface: content
+    read:
+    - $SNAP_COMMON/captures
+
+hooks:
+  install:
+    plugs: []
+
 apps:
   tcpdump:
     command: usr/sbin/tcpdump

@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+# Create the captures directory for letting snap_daemon write out files. We
+# also export this with our content interface.
+CAPTURES="$SNAP_COMMON/captures"
+
+if [ ! -d "$CAPTURES" ]; then
+    mkdir -m 770 "$CAPTURES"
+    chown snap_daemon:root "$CAPTURES"
+fi
