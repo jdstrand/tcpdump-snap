@@ -46,6 +46,6 @@ interface. Other snaps may specify in their ```snap.yaml```:
 
 Then when install that snap:
 
-    $ sudo snap connect tcpdump:captures yoursnap:captures
+    $ sudo snap connect <yoursnap>:captures tcpdump:captures
 
 See https://forum.snapcraft.io/t/the-content-interface for details.
