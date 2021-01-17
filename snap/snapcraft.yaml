@@ -1,4 +1,4 @@
-name: tcpdump
+name: tcpdump-jdstrand
 summary: tcpdump for Ubuntu Core
 version: 4.9.3-4+snap1
 license: BSD-3-Clause
