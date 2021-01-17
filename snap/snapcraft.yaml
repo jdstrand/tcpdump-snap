@@ -19,10 +19,9 @@ system-usernames:
 
 apps:
   tcpdump:
-    # -Z snap_daemon works but if specify -Z root is looks weird in ps
-    # even though it ends up running as root. Perhaps update wrapper?
-    command: usr/sbin/tcpdump -Z snap_daemon
+    command: usr/sbin/tcpdump
     environment:
+      # setuid(snap_daemon), setgid(snap_daemon) and setgroups(0, NULL)
       LD_PRELOAD: "$SNAP/wraplib.so"
     plugs:
     - bluetooth-control
