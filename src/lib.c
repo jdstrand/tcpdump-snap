@@ -51,8 +51,7 @@ int initgroups(const char *user, const gid_t group) {
 /*
  * The tcpdump from the Ubuntu will setuid/setgid to the tcpdump user, which
  * isn't allowed by the sandbox policy. The -Z allows choosing another user,
- * so allow -Z to root, otherwise always drop to snap_daemon. Do the same with
- * chown() for writing out pcap files.
+ * so allow -Z to root, otherwise always drop to snap_daemon.
  */
 int setgid(gid_t gid) {
 	// lookup the libc's setgid() if we haven't already
@@ -98,6 +97,17 @@ int setuid(uid_t uid) {
 	return original_setuid(u);
 }
 
+/*
+ * tcpdump -w <file> causes tcpdump to do a chown(path, "tcpdump", "tcpdump")
+ * which causes a DAC_OVERRIDE denial. So we instead set the capture directory
+ * to 0770 with root:snap_daemon and then set these files as root:snap_daemon,
+ * which allows the initial write but also -w to overwrite the same file. When
+ * using -Z root, we see chown on root:root, so honor that.
+ *
+ * For now, this works ok with 0770 root:snap_daemon capture directory, but
+ * the files are 0644. We might want to set the umask to 0002 instead so the
+ * files of 0664.
+ */
 int chown(const char *pathname, uid_t uid, gid_t gid) {
 	// lookup the libc's chown() if we haven't already
 	if (!original_chown) {
@@ -111,19 +121,11 @@ int chown(const char *pathname, uid_t uid, gid_t gid) {
 	}
 
 	// we could look this up and fail, but snapd hardcodes it
-	uid_t u = 584788;
-	if (uid == 0) {
-		u = uid;
-	} /* else {
-		fprintf(stderr,
-			"cannot chown(..., %d, ...), using %d\n", uid, u);
-	} */
+	uid_t u = 0;
 	gid_t g = 584788;
-	if (gid == 0) {
-		g = gid;
-	} /* else {
-		fprintf(stderr,
-			"cannot chown(..., ..., %d), using %d\n", gid, g);
-	} */
+	if (uid == 0 && gid == 0) {
+		u = 0;
+		g = 0;
+	}
 	return original_chown(pathname, u, g);
 }

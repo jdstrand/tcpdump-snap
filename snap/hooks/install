@@ -7,5 +7,5 @@ CAPTURES="$SNAP_COMMON/captures"
 
 if [ ! -d "$CAPTURES" ]; then
     mkdir -m 770 "$CAPTURES"
-    chown snap_daemon:root "$CAPTURES"
+    chown root:snap_daemon "$CAPTURES"
 fi
