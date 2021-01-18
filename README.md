@@ -9,8 +9,6 @@ To install:
 
 ## Usage
 
-Use:
-
     $ sudo tcpdump
 
 tcpdump will drop privileges to the ```snap_daemon``` user and group by
