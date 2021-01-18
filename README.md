@@ -31,7 +31,7 @@ In these cases, you will need to create a directory that ```snap_daemon``` can
 write to. Eg:
 
     $ mkdir -m 770 $HOME/captures
-    $ sudo chgrp snap-daemon $HOME/captures
+    $ sudo chown root:snap-daemon $HOME/captures
     $ sudo tcpdump -w $HOME/captures/my.pcap
 
 ## Integration with other snaps
