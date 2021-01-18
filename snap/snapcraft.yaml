@@ -20,6 +20,9 @@ architectures:
 - build-on: ppc64el
 - build-on: s390x
 
+assumes:
+- command-chain
+
 system-usernames:
   snap_daemon: shared
 
@@ -36,6 +39,8 @@ hooks:
 apps:
   tcpdump:
     command: usr/sbin/tcpdump
+    command-chain:
+    - bin/set-user  # -Z snap_daemon
     environment:
       # setuid(snap_daemon), setgid(snap_daemon) and setgroups(0, NULL)
       LD_PRELOAD: "$SNAP/wraplib.so"
@@ -66,3 +71,6 @@ parts:
     - -usr/lib/*/libssl*
     - -usr/share/doc
     - -usr/share/lintian
+  dumper:
+    plugin: dump
+    source: files/

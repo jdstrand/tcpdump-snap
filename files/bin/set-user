@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+# specifying '-Z other' results in '-Z other -Z snap_daemon', which works but
+# could be cleaner.
+if echo "$@" | grep -qv "\-Z *root" ; then
+    exec "$@" -Z snap_daemon
+else
+    exec "$@"
+fi

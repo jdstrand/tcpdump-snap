@@ -14,8 +14,6 @@
 
 static int (*original_setgroups) (size_t, const gid_t[]);
 static int (*original_initgroups) (const char *, const gid_t);
-static int (*original_setgid) (const gid_t);
-static int (*original_setuid) (const uid_t);
 static int (*original_chown) (const char *, const uid_t, const gid_t);
 
 int setgroups(size_t size, const gid_t *list) {
@@ -46,55 +44,6 @@ int initgroups(const char *user, const gid_t group) {
 	}
 
 	return setgroups(0, NULL);
-}
-
-/*
- * The tcpdump from the Ubuntu will setuid/setgid to the tcpdump user, which
- * isn't allowed by the sandbox policy. The -Z allows choosing another user,
- * so allow -Z to root, otherwise always drop to snap_daemon.
- */
-int setgid(gid_t gid) {
-	// lookup the libc's setgid() if we haven't already
-	if (!original_setgid) {
-		dlerror();
-		original_setgid = dlsym(RTLD_NEXT, "setgid");
-		if (!original_setgid) {
-			fprintf(stderr, "could not find setgid in libc");
-			return -1;
-		}
-		dlerror();
-	}
-
-	// we could look this up and fail, but snapd hardcodes it
-	gid_t g = 584788;
-	if (gid == 0) {
-		g = gid;
-	} /* else {
-		fprintf(stderr, "cannot setgid(%d), using %d\n", gid, g);
-	} */
-	return original_setgid(g);
-}
-
-int setuid(uid_t uid) {
-	// lookup the libc's setuid() if we haven't already
-	if (!original_setuid) {
-		dlerror();
-		original_setuid = dlsym(RTLD_NEXT, "setuid");
-		if (!original_setuid) {
-			fprintf(stderr, "could not find setuid in libc");
-			return -1;
-		}
-		dlerror();
-	}
-
-	// we could look this up and fail, but snapd hardcodes it
-	uid_t u = 584788;
-	if (uid == 0) {
-		u = uid;
-	} /* else {
-		fprintf(stderr, "cannot setuid(%d), using %d\n", uid, u);
-	} */
-	return original_setuid(u);
 }
 
 /*
